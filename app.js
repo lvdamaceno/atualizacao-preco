@@ -16,7 +16,7 @@ function sendMessage(codprod, vlrvenda) {
     fetch('https://graph.facebook.com/v18.0/183582418183115/messages', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer EAAloZC9QhVF8BOZBiaCcBf5EJ9I7UrKSwuNQ8p0FZAwo8jNslaNjMEd5k6ZAXMyAsVDnVngj2kN3ZCVaA3ecFZAzb5dtfei4M7zZC0XZCpr8zko88NFJY4ZCyKIwfCHtDgKCihJ1UcPxHaUuBJHkswe68NO0tPZC3U0rfkHoEHsuKwudFUAeAYGXl9WX2XA2x8dZBW2Ijl0ynZAumhiL1IbCWQ432ZAa4oWvfuAPOYlIPaZA4Ubg4ZD',
+            'Authorization': process.env.TOKEN,
             'Content-Type': 'application/json',
             'Cookie': 'ps_l=0; ps_n=0'
         },
@@ -65,11 +65,16 @@ async function executeQuery() {
         // Executa uma consulta
         const result = await sql.query`SELECT NUTAB, CODPROD, VLRVENDA FROM TGFEXC WHERE NUTAB = (SELECT MAX(NUTAB) [NUTAB] FROM TGFEXC)`;
 
-        for (let i = 1; i <= 5; i++) {
-            var codprod = result.recordset[i].CODPROD
-            var vlrvenda = result.recordset[i].VLRVENDA
-            sendMessage(codprod, vlrvenda)
-        }
+        // for (let i = 1; i <= result.recordsets[0].length; i++) {
+        //     var codprod = result.recordset[0][i].CODPROD
+        //     console.log(codprod)
+        //     var vlrvenda = result.recordset[0][i].VLRVENDA
+        //     console.log(vlrvenda)
+
+        //     // sendMessage(codprod, vlrvenda)
+        // }
+
+        console.log(result.recordsets[0][2].CODPROD)
 
     } catch (err) {
         console.log(err); // Exibe erros, se houverem
