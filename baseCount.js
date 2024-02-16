@@ -10,7 +10,7 @@ db.serialize(() => {
 });
 
 db.serialize(() => {
-  db.all("SELECT * FROM prices WHERE codprod = 436999", (err, rows) => {
+  db.all("SELECT COUNT (*) as total FROM prices", (err, rows) => {
     if (err) {
       console.error(err.message);
     }

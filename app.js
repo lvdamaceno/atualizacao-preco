@@ -63,18 +63,19 @@ function saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda) {
             return console.error(err.message);
         }
         if (!row) {
+            db.run("DELETE FROM prices WHERE CODPROD = ?", [codprod])
             db.run("INSERT INTO prices (nutab, codprod, vlrvenda) VALUES (?, ?, ?)", [nutab, codprod, vlrvenda], (err) => {
                 if (err) {
                     return console.error(err.message);
                 }
-                console.log(`O produto ${codprod} foi salvo com valor ${vlrvenda}`);
+                console.log(`O produto ${codprod} foi atualizado para o valor ${vlrvenda}`);
                 sendMessage(codprod, vlrvenda)
                 console.log("Mensagem enviada")
-            });
+            })
         } else {
-            console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
+            // console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
         }
-    });
+    })
 }
 
 // Função de conexão e execução de consulta
@@ -106,5 +107,7 @@ async function executeQuery() {
 }
 
 executeQuery()
+
+
 
 
