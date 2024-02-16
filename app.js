@@ -1,6 +1,9 @@
 const sql = require('mssql');
 require('dotenv').config();
 
+const sqlite3 = require('sqlite3').verbose();
+let db = new sqlite3.Database('database.db');
+
 // Configuração de conexão com o banco de dados
 const config = {
     user: process.env.DB_USER,
@@ -54,27 +57,51 @@ function sendMessage(codprod, vlrvenda) {
         });
 }
 
+function saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda) {
+    db.get("SELECT codprod FROM prices WHERE codprod = ? and vlrvenda = ?", [codprod, newvlrvenda], (err, row) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        if (!row) {
+            db.run("INSERT INTO prices (nutab, codprod, vlrvenda) VALUES (?, ?, ?)", [nutab, codprod, vlrvenda], (err) => {
+                if (err) {
+                    return console.error(err.message);
+                }
+                console.log(`O produto ${codprod} foi salvo com valor ${vlrvenda}`);
+                sendMessage(codprod, vlrvenda)
+                console.log("Mensagem enviada")
+            });
+        } else {
+            console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
+        }
+    });
+}
+
 // Função de conexão e execução de consulta
 async function executeQuery() {
+
     try {
         // Conecta ao banco de dados
         await sql.connect(config);
-
         // Executa uma consulta
         const result = await sql.query(process.env.QUERY);
 
         const len = result.recordsets[0].length
 
-        for (let i = 1; i <= len; i++) {
-            var codprod = result.recordset[0].CODPROD
-            var vlrvenda = result.recordset[0].VLRVENDA
-            sendMessage(codprod, vlrvenda)
+        for (let i = 0; i < len; i++) {
+            var nutab = result.recordset[i].NUTAB
+            var codprod = result.recordset[i].CODPROD
+            var vlrvenda = result.recordset[i].VLRVENDA
+            var newvlrvenda = result.recordset[i].VLRVENDA
+            saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda)
+
         }
     } catch (err) {
         console.log(err); // Exibe erros, se houverem
     } finally {
         // Fecha a conexão
         sql.close();
+        db.close();
     }
 }
 
