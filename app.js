@@ -7,9 +7,7 @@ const config = {
     password: process.env.DB_PASSWORD,
     server: process.env.DB_SERVER,
     database: process.env.DB_DATABASE,
-    options: {
-        encrypt: false // Se você estiver usando uma conexão criptografada, altere para true
-    }
+    options: { encrypt: false }
 };
 
 function sendMessage(codprod, vlrvenda) {
@@ -22,7 +20,7 @@ function sendMessage(codprod, vlrvenda) {
         },
         body: JSON.stringify({
             "messaging_product": "whatsapp",
-            "to": "5591986399496",
+            "to": process.env.PHONE,
             "type": "template",
             "template": {
                 "name": "atualizacao_de_preco",
@@ -63,19 +61,15 @@ async function executeQuery() {
         await sql.connect(config);
 
         // Executa uma consulta
-        const result = await sql.query`SELECT NUTAB, CODPROD, VLRVENDA FROM TGFEXC WHERE NUTAB = (SELECT MAX(NUTAB) [NUTAB] FROM TGFEXC)`;
+        const result = await sql.query(process.env.QUERY);
 
-        // for (let i = 1; i <= result.recordsets[0].length; i++) {
-        //     var codprod = result.recordset[0][i].CODPROD
-        //     console.log(codprod)
-        //     var vlrvenda = result.recordset[0][i].VLRVENDA
-        //     console.log(vlrvenda)
+        const len = result.recordsets[0].length
 
-        //     // sendMessage(codprod, vlrvenda)
-        // }
-
-        console.log(result.recordsets[0][2].CODPROD)
-
+        for (let i = 1; i <= len; i++) {
+            var codprod = result.recordset[0].CODPROD
+            var vlrvenda = result.recordset[0].VLRVENDA
+            sendMessage(codprod, vlrvenda)
+        }
     } catch (err) {
         console.log(err); // Exibe erros, se houverem
     } finally {
@@ -84,7 +78,6 @@ async function executeQuery() {
     }
 }
 
-// Chama a função para executar a consulta
 executeQuery()
 
 
