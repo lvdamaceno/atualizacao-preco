@@ -63,7 +63,7 @@ function saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda) {
                 // sendMessage(codprod, vlrvenda)
             })
         } else {
-            console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
+            // console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
         }
     })
 }
@@ -76,7 +76,13 @@ async function executeQuery() {
         // Executa uma consulta
         const result = await sql.query(process.env.QUERY);
         const len = result.recordsets[0].length
-        console.log('Conectando...')
+
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        console.log(`${hours}:${minutes}:${seconds} - Buscando novos preços...`)
         for (let i = 0; i < len; i++) {
             var nutab = result.recordset[i].NUTAB
             var codprod = result.recordset[i].CODPROD
@@ -93,13 +99,5 @@ async function executeQuery() {
     }
 }
 
-// Definindo a função que você deseja executar
-function minhaFuncao() {
-    console.log('Executando minha função...');
-    // Adicione o código que você deseja executar aqui
-}
+setTimeout(executeQuery, 60000);
 
-// Executar a função a cada segundo usando setInterval
-// setInterval(executeQuery, 15000); // 1000 milissegundos = 1 segundo
-
-executeQuery()
