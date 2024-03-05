@@ -10,7 +10,7 @@ db.serialize(() => {
 });
 
 db.serialize(() => {
-  db.all("SELECT * FROM prices", (err, rows) => {
+  db.all("SELECT * FROM prices WHERE codprod IN (436410, 436593)", (err, rows) => {
     if (err) {
       console.error(err.message);
     }

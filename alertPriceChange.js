@@ -13,7 +13,7 @@ const config = {
     options: { encrypt: false }
 };
 
-async function sendMessage(codprod, vlrvenda) {
+async function sendMessage(codprod, vlrvenda, contact) {
     try {
         const response = await fetch('https://graph.facebook.com/v18.0/183582418183115/messages', {
             method: 'POST',
@@ -24,7 +24,7 @@ async function sendMessage(codprod, vlrvenda) {
             },
             body: JSON.stringify({
                 "messaging_product": "whatsapp",
-                "to": process.env.PHONE,
+                "to": contact,
                 "type": "template",
                 "template": {
                     "name": "atualizacao_de_preco",
@@ -49,6 +49,7 @@ async function sendMessage(codprod, vlrvenda) {
 }
 
 function saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda) {
+    const contacts = [process.env.PHONE1, process.env.PHONE2]
     db.get("SELECT codprod FROM prices WHERE codprod = ? and vlrvenda = ?", [codprod, newvlrvenda], (err, row) => {
         if (err) {
             return console.error(err.message);
@@ -60,7 +61,11 @@ function saveToBaseAndSendMessage(nutab, codprod, vlrvenda, newvlrvenda) {
                     return console.error(err.message);
                 }
                 console.log(`O produto ${codprod} foi atualizado para o valor ${vlrvenda}`);
-                // sendMessage(codprod, vlrvenda)
+
+                // let i, len;
+                // for (i = 0, len = contacts.length; i < len; i++) {
+                //     sendMessage(codprod, vlrvenda, contacts[i])
+                // }
             })
         } else {
             // console.log(`O produto ${codprod} já existe na tabela com valor ${vlrvenda}`);
@@ -99,5 +104,6 @@ async function executeQuery() {
     }
 }
 
-setTimeout(executeQuery, 60000);
+// setTimeout(executeQuery, 30000);
+executeQuery()
 
