@@ -10,14 +10,12 @@ db.serialize(() => {
     if (err) {
       console.error(err.message);
     }
-    // Processa os resultados da consulta
     rows.forEach((row) => {
-      console.log(row); // Aqui você pode fazer o que quiser com os dados, como imprimir no console
+      console.log(row);
     });
   });
 });
 
-// Feche a conexão com o banco de dados após as operações
 db.close();
 
 
